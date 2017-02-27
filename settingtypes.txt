@@ -1,0 +1,5 @@
+# Enables the preconfigured chat modes
+chat_modes.default (Load default chat modes) bool true
+
+# Default mode
+chat_modes.mode (Default mode for players joining) string none

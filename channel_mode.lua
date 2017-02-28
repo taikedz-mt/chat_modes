@@ -28,5 +28,7 @@ chat_modes.register("channel", {
 		for _,player in pairs(allchannels[ playerschannel[playername] ]) do
 			targetplayers[#targetplayers] = player
 		end
+
+		return targetplayers
 	end
 })

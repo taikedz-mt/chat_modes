@@ -26,17 +26,24 @@ By default, this is set to
 
 ## Usage
 
-Any player who has both the `shout` and `cmodeswitch` privileges has access to the following commands:
+Any player with the `shout` privilege can deafen themselves
+
+* `/deaf`
+	* This commands toggles the player's `deaf` mode. If deaf mode is on, they do not receive chat messages, regardless of their chat mode.
+
+Players with both the `shout` and `cmodeswitch` privileges has access to the following commands:
 
 * `/chatmode MODE [ARGUMENTS ...]`
 	* this sets a new chat mode. Some chat modes can take extra arguments, others not.
 * `/chatmodes`
 	* this lists the chat modes available, with a description
 
-Players with `chatadmin` privilege have an additional command:
+Players with the `basic_privs` privilege have access to moderator messaging
 
 * `/assignchatmode PLAYERNAME MODE [ARGUMENTS]`
 	* Assigns a chat mode to a given player
+* `/wall GLOBALMESSAGE`
+	* Send message to all connected players, regardless of their `deaf` status
 
 ## API
 
@@ -53,10 +60,14 @@ You can implement a new chat mode by calling
 
 The mode definition must include the following table fields:
 
-* `help` -- brief summary of the options
-* `register(playername, params)` -- a handler function that is called any time a user switches chat modes. It is expected that the handler will register the player as having activated the mode, according to its parameters.
-* `deregister(playername, params)` -- a handler function that is called any time a user switches chat modes. It is expected that the handler will remove the player from the list of players registered against this mode, according to its parameters.
-* `getPlayers(playername, message)` --  a handler function that returns a list of players. This function is responsible for determining which players should receive the message.
+* `help`
+	* brief summary of the options
+* `register(playername, params_array)`
+	* a handler function that is called any time a user switches chat modes. It is expected that the handler will register the player as having activated the mode, according to its parameters.
+* `deregister(playername)`
+	* a handler function that is called any time a user switches chat modes. It is expected that the handler will remove the player from the list of players registered against this mode.
+* `getPlayers(playername, message)`
+	* a handler function that returns a list of players. This function is responsible for determining which players should receive the message.
 
 ### Example of `modedef`
 
@@ -68,10 +79,10 @@ The following (fairly pointless) module will send a mesasge to some players, dep
 		help = "<prob> -- send a message to all, with a probability <prob> of sending the message at all.",
 
 		register = function(playername, params)
-			probplayers[playername] = int(params)
+			probplayers[playername] = int(params[1]) or 10
 		end,
 
-		deregister = function(playername, params)
+		deregister = function(playername)
 			probplayers[playername] = nil
 		end,
 

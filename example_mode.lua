@@ -1,26 +1,33 @@
-
 -- EXAMPLE
 -- Copy this file to your mod and adjust it as required
+-- You MUST add chat_modes to your depends.txt
 
-local examplemode = {}
+-- ============================================
 
-chat_modes.register("example", {
-	help = "example",
+-- Check both if chat_modes is registered, and if it sucessfully activated.
 
-	register = function(playername, params)
-		examplemode[playername] = true
-	end,
+if minetest.get_modpath("chat_modes") and chat_modes then
 
-	deregister = function(playername)
-		examplemode[playername] = nil
-	end,
+	local examplemode = {}
 
-	getPlayers = function(playername, message)
-		local targetplayers = {}
-		local thisplayer = minetest.get_player_by_name(playername)
-		
-		-- INSERT LOGIC HERE
+	chat_modes.register("example", {
+		help = "example",
 
-		return targetplayers
-	end
-})
+		register = function(playername, params)
+			examplemode[playername] = true
+		end,
+
+		deregister = function(playername)
+			examplemode[playername] = nil
+		end,
+
+		getPlayers = function(playername, message)
+			local targetplayers = {}
+			local thisplayer = minetest.get_player_by_name(playername)
+			
+			-- INSERT LOGIC HERE
+
+			return targetplayers
+		end
+	})
+end

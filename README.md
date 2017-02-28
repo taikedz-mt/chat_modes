@@ -1,6 +1,6 @@
 # Minetest : Chat Modes (`chat_modes`)
 
-***incomplete***
+***----- incomplete -----***
 
 A Minetest mod to enable multiple chat modes.
 

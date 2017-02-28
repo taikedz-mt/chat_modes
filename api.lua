@@ -65,9 +65,15 @@ local function chatmodeswitch(playername, argsarray)
 
 	-- ====
 
-	oldmodedef.deregsiter(playername)
+	if oldmodedef.deregister then
+		oldmodedef.deregsiter(playername)
+	end
+
 	playermodes[playername] = newmodename
-	newmodedef.register(playername, argsarray)
+	
+	if newmodedef.register then
+		newmodedef.register(playername, argsarray)
+	end
 end
 
 local function argstoarry(arguments)

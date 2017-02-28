@@ -20,7 +20,9 @@ The mode definition must include the following table fields:
 * `deregister(playername)`
 	* a handler function that is called any time a user switches chat modes. It is expected that the handler will remove the player from the list of players registered against this mode.
 * `getPlayers(playername, message)`
-	* a handler function that returns a list of players. This function is responsible for determining which players should receive the message.
+	* a handler function that returns a list of players.
+	* This function is responsible for determining which players should receive the message.
+	* The message content is provided for extra flexibility.
 
 ## Example file
 

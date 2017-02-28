@@ -2,7 +2,7 @@
 -- Chat mode assignment by moderator
 -- Implement support for custom privs
 -- Implement @-pings - play a sound to target player if @playername is mentioned
-
+-- IRC mode that sends to IRC when `irc` mod is loaded, as well as acting as `shout`
 
 
 

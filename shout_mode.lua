@@ -10,6 +10,10 @@ chat_modes.register("shout", {
 	end,
 
 	getPlayers = function()
+		if minetest.get_modpath("irc") and irc then
+			irc:say(message)
+		end
+
 		return minetest.get_connected_players()
 	end
 })

@@ -1,3 +1,11 @@
+-- TODO
+-- Chat mode assignment by moderator
+-- Implement support for custom privs
+
+
+
+
+
 -- Namespace global variable
 
 chat_modes = {}
@@ -5,6 +13,8 @@ chat_modes = {}
 -- Privs
 
 minetest.register_privilege("cmodeswitch", "Player can switch their chat mode.")
+
+
 
 -- ================================
 -- Main vairables
@@ -18,6 +28,8 @@ local playermodes = {} -- playername => modestring
 local deafplayers = {}
 
 local defaultmode = minetest.setting_get("chat_modes.mode") or "shout"
+
+
 
 
 -- ================================
@@ -37,6 +49,8 @@ function chat_modes.chatsend(player, message)
 		minetest.chat_send_player(player, message)
 	end
 end
+
+
 
 -- ================================
 -- General chat utilities
@@ -64,6 +78,8 @@ minetest.register_chatcommand("wall", {
 		minetest.chat_send_all("GLOBAL MESSAGE FROM MODERATOR "..playername..": "..message)
 	end,
 })
+
+
 
 -- ================================
 -- Command registration
@@ -111,6 +127,8 @@ minetest.register_chatcommand("chatmodes", {
 	end,
 })
 
+
+
 -- ================================
 -- Interception
 
@@ -123,6 +141,8 @@ minetest.register_on_chat_message(function(playername, message)
 	end
 end)
 
+
+
 -- ================================
 -- Player management
 
@@ -133,6 +153,8 @@ end)
 minetest.register_on_playerjoin(function(player) -- FIXME verify
 	playermodes[player:get_player_name()] = defaultmode
 end)
+
+
 
 -- ================================
 -- Load defaults

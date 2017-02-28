@@ -1,5 +1,4 @@
 -- TODO
--- Chat mode assignment by moderator
 -- Implement support for custom privs
 -- Implement @-pings - play a sound to target player if @playername is mentioned
 
@@ -50,6 +49,30 @@ function chat_modes.chatsend(player, message)
 	end
 end
 
+-- ================================
+-- Chat mode switcher
+
+local function chatmodeswitch(playername, argsarray)
+	local oldmodedef = heuristics[ playermodes[playername] ]
+
+	local newmodename = table.remove(argsarray, 1)
+	local newmodedef = heuristics[newmodename]
+
+	if not newmodedef then
+		minetest.chat_send_player(playername, "No such mode.")
+		return
+	end
+
+	-- ====
+
+	oldmodedef.deregsiter(playername)
+	playermodes[playername] = newmodename
+	newmodedef.register(playername, argsarray)
+end
+
+local function argstoarry(arguments)
+	return arguments:split(" ")
+end
 
 
 -- ================================
@@ -89,7 +112,10 @@ minetest.register_chatcommand("assignchatmode", {
 	params = "<player> <chatmode>",
 	description = "Set a player's chat mode",
 	func = function(playername, params)
-		-- TODO
+		local argsarray = argstoarry(arguments)
+
+		playername = table.remove(argsarray, 1)
+		chatmodeswitch(playername, argsarray)
 	end
 })
 
@@ -98,23 +124,8 @@ minetest.register_chatcommand("chatmode", {
 	description = "Set a new chat mode",
 	privs = {shout = true, cmodeswitch = true},
 	func = function(playername, arguments)
-		local oldmodedef = heuristics[ playermodes[playername] ]
-
-		local argsarray = arguments:split(" ")
-		local newmodename = table.remove(argsarray, 1)
-		local newmodedef = heuristics[newmodename]
-
-		if not newmodedef then
-			minetest.chat_send_player(playername, "No such mode.")
-			return
-		end
-
-		-- ====
-
-		oldmodedef.deregsiter(playername)
-		playermodes[playername] = newmodename
-		newmodedef.register(playername, argsarray)
-	end
+		chatmodeswitch( playername, argstoarry(arguments) )
+	end,
 })
 
 minetest.register_chatcommand("chatmodes", {

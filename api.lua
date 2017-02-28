@@ -1,6 +1,7 @@
 -- TODO
 -- Chat mode assignment by moderator
 -- Implement support for custom privs
+-- Implement @-pings - play a sound to target player if @playername is mentioned
 
 
 

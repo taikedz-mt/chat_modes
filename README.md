@@ -1,5 +1,7 @@
 # Minetest : Chat Modes (`chat_modes`)
 
+***not ready***
+
 A Minetest mod to enable multiple chat modes.
 
 By default, `chat_modes` is not active. Set `chat_modes.active = true` to activate it.

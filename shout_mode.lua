@@ -1,7 +1,7 @@
 
 -- The default-default mode - just get all connected players
 chat_modes.register("shout", {
-	help = "Send all messages to all players",
+	help = "Send all messages to all non-deaf players",
 
 	getPlayers = function()
 		if minetest.get_modpath("irc") and irc then

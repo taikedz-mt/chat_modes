@@ -19,6 +19,7 @@ A few modules are provided by default, annd active by default if `chat_modes.act
 * `shout` -- this allows the player to broadacast a message to all connected players, just like in normal chat.
 * `proximity` -- this module sends a message to players within the proximity of the sending player
 * `channel` -- this module sends messages only to players who are in the shout channel. A player can only be in one channel at a time.
+	* There is a `moderators` channel which only players with `basic_privs` can access, to allow moderators to chat.
 
 It is possible to disable these modules by specifying a comma-separated list to `chat_modes.available`.
 

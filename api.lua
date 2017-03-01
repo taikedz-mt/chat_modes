@@ -1,5 +1,4 @@
 -- TODO
--- Implement support for custom privs
 -- Implement @-pings - play a sound to target player if @playername is mentioned
 
 
@@ -60,6 +59,11 @@ local function chatmodeswitch(playername, argsarray)
 
 	if not newmodedef then
 		minetest.chat_send_player(playername, "No such mode.")
+		return
+	end
+
+	if newmodedef.can_register and not newmodedef.can_register(playername, argsarray) then
+		minetest.chat_send_player(playername, "You cannot switch to that mode with those settings.")
 		return
 	end
 
@@ -156,6 +160,8 @@ minetest.register_on_chat_message(function(playername, message)
 	for _,theplayer in pairs(valid_players.players) do
 		chat_modes.chatsend(theplayer:get_player_name(), message)
 	end
+
+	return true
 end)
 
 
@@ -163,12 +169,18 @@ end)
 -- ================================
 -- Player management
 
-minetest.register_on_playerleave(function(player) -- FIXME verify
-	playermodes[player:get_player_name()] = nil
+minetest.register_on_leaveplayer(function(player, timedout)
+	-- Do not discard pref for a timed out player
+	if not timedout then
+		playermodes[player:get_player_name()] = nil
+	end
 end)
 
-minetest.register_on_playerjoin(function(player) -- FIXME verify
-	playermodes[player:get_player_name()] = defaultmode
+minetest.register_on_joinplayer(function(player)
+	-- Do not reinitialize after a player timeout
+	if not playermodes[player:get_player_name()] then
+		playermodes[player:get_player_name()] = defaultmode
+	end
 end)
 
 

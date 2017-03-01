@@ -14,7 +14,12 @@ You can implement a new chat mode by calling
 The mode definition must include the following table fields:
 
 * `help`
-	* brief summary of the options
+	* a string -- brief summary of the options
+* `can_register(playername, params_array)`
+	* optional
+	* checks whether the player can switch to the mode, given the parameters
+	* does not register the player - simply performs the check and returns a boolean
+	* returns `true` if the registration would normally succeed
 * `register(playername, params_array)`
 	* a handler function that is called any time a user switches chat modes. It is expected that the handler will register the player as having activated the mode, according to its parameters.
 * `deregister(playername)`

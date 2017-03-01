@@ -108,7 +108,7 @@ minetest.register_chatcommand("wall", {
 	description = "Send a message to all players, regardless of chat mode or deaf status - for moderators.",
 	privs = {shout = true, basic_privs = true},
 	func = function(playername, message)
-		minetest.chat_send_all("GLOBAL MESSAGE FROM MODERATOR "..playername..": "..message)
+		minetest.chat_send_all("MODERATOR "..playername..": "..message)
 	end,
 })
 
@@ -123,8 +123,8 @@ minetest.register_chatcommand("assignchatmode", {
 	description = "Set a player's chat mode",
 	func = function(playername, params)
 		local argsarray = argstoarry(arguments)
-
 		playername = table.remove(argsarray, 1)
+
 		chatmodeswitch(playername, argsarray)
 	end
 })
@@ -143,7 +143,12 @@ minetest.register_chatcommand("chatmodes", {
 	privs = {shout = true, cmodeswitch = true},
 	func = function(playername, params)
 		for modename,modedef in pairs(heuristics) do
-			minetest.chat_send_player(playername, modename..": "..str(modedef.help) )
+			local helptext = "(unknown)"
+			if modedef.help then
+				helptext = modedef.help
+			end
+
+			minetest.chat_send_player(playername, modename..": "..helptext )
 		end
 	end,
 })

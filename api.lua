@@ -154,6 +154,10 @@ minetest.register_chatcommand("chatmodes", {
 -- Interception
 
 minetest.register_on_chat_message(function(playername, message)
+	if not minetest.get_player_privs(playername, {shout = true}) then
+		return
+	end
+
 	local modedef = heuristics[ playermodes[playername] ]
 	local valid_players = modedef.getplayers(playername, message)
 

@@ -1,9 +1,9 @@
 
 -- Proximity mode
 
-local playerproximitypref = {}
+local playerproximitypref = {} -- playername --> (int) max message distance
 
-local maxproximity = int(minetest.setting_get("chat_modes.maxproximity") ) or 100
+local maxproximity = int(minetest.setting_get("chat_modes.maxproximity") ) or 50
 
 chat_modes.register("proximity", {
 	help = "Send messages to players within a certain distance",

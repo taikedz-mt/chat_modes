@@ -25,6 +25,7 @@ local playermodes = {} -- playername => modestring
 -- Keep track of players who have deafened themselves
 local deafplayers = {}
 
+-- If the user activates chat_modes but does not properly configure it, just activate "shout"
 local defaultmode = minetest.setting_get("chat_modes.mode") or "shout"
 
 
@@ -197,7 +198,7 @@ end)
 -- ================================
 -- Load defaults
 
-local defaultmodes = minetest.setting_get("chat_modes.defaults")
+local defaultmodes = minetest.setting_get("chat_modes.defaults") or defaultmode
 if defaultmodes then
 	for _,modename in pairs(defaultmodes:split(",")) do
 		dofile(minetest.get_modpath("chat_modes").."/"..modename.."_mode.lua" )

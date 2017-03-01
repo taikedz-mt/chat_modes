@@ -1,5 +1,7 @@
 -- TODO
--- Implement @-pings - play a sound to target player if @playername is mentioned
+-- Implement @-pings
+--	- play a sound to target player if @playername is mentioned
+--	- if @playername is mentioned, send to that player
 
 
 

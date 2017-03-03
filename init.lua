@@ -15,5 +15,5 @@ See README.md for more information.
 --]]
 
 if minetest.setting_getbool("chat_modes.active") then
-	dofile( minetest.get_modpath("chat_modes".."/api.lua") )
+	dofile( minetest.get_modpath("chat_modes").."/api.lua" )
 end

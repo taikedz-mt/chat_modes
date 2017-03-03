@@ -70,3 +70,36 @@ The following (fairly pointless) module will send a mesasge to some players, dep
 	})
 
 
+## Interceptors
+
+It is possible to register interceptor handlers - these are functions which ALWAYS run, after the mode handler, but before the message dispatch.
+
+The handler takes as arguments the name of the sender of the message, the message contents, and the list of target players.
+
+If the handler returns false, then the message dispatch will not run, and the message will not be sent.
+
+Otherwise, the handler must return a list of players - even if that is just the original list of players it received. This allows the interceptor to remove players from the list if it deems it necessary.
+
+For example, this (pointless) interceptor can decline to send messages from players with "corpse" in their name (by returning false to prevent sending the message at all), or prevent delivery of messages to players with "corpse" in their name (by returning a subset of the originally received targets)
+
+	chat_modes.register_interceptor("no corpses", function(sender, message, targets)
+		if string.match(sender, "corpse") then
+			minetest.chat_send_player("corpses cannot talk!")
+			return false
+		end
+
+		local newtargets = {}
+		local corpses = ""
+		local i = 1
+		for _,player in pairs(targets) do
+			if not string.match(player:get_player_name(), "corpse") then
+				newtargets[i] = player
+				i = i+1
+				corpses = corpses..player..", "
+			end
+		end
+
+		minetest.chat_send_player("DO not wake corpses"..corpses.." they cannot chat!")
+
+		return newtargets
+	end)

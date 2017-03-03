@@ -46,9 +46,8 @@ Players with both the `shout` and `cmodeswitch` privileges has access to the fol
 
 Players with the `basic_privs` privilege have access to moderator messaging
 
-* `/assignchatmode PLAYERNAME MODE [ARGUMENTS]`
+* `/chatmodeset PLAYERNAME MODE [ARGUMENTS]`
 	* Assigns a chat mode to a given player
-	* (**not yet implemented**)
 * `/wall GLOBALMESSAGE`
 	* Send message to all connected players, regardless of their `deaf` status
 

@@ -1,6 +1,6 @@
 
 -- The default-default mode - just get all connected players
-chat_modes.register_mode("shout", {
+chat_modes.register_mode("chat_modes:shout", {
 	help = "Send all messages to all non-deaf players",
 
 	getPlayers = function()

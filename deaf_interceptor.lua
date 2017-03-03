@@ -5,7 +5,7 @@ function chat_modes.isdeaf(playername)
 	return deafplayers[playername]
 end
 
-minetest.register_chatcommand("deaf", {
+minetest.register_chatcommand("chat_modes:deaf", {
 	description = "Toggle deaf status. If you are deaf (Deaf mode 'on'), you do not receive any chat messages.",
 	privs = {shout = true},
 	func = function(playername, args)

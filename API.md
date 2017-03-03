@@ -41,7 +41,7 @@ The following (fairly pointless) module will send a mesasge to some players, dep
 
 	local probplayers = {}
 
-	chat_modes.register_mode("maybesay", {
+	chat_modes.register_mode("mymod:maybesay", {
 		help = "<prob> -- send a message to all, with a probability <prob> of sending the message at all.",
 
 		register = function(playername, params)
@@ -82,7 +82,7 @@ Otherwise, the handler must return a list of players - even if that is just the 
 
 For example, this (pointless) interceptor can decline to send messages from players with "corpse" in their name (by returning false to prevent sending the message at all), or prevent delivery of messages to players with "corpse" in their name (by returning a subset of the originally received targets)
 
-	chat_modes.register_interceptor("no corpses", function(sender, message, targets)
+	chat_modes.register_interceptor("mymod:no_corpses", function(sender, message, targets)
 		if string.match(sender, "corpse") then
 			minetest.chat_send_player("corpses cannot talk!")
 			return false

@@ -19,7 +19,7 @@ local function channelcheck(playername, params)
 	end
 end
 
-chat_modes.register_mode("channel", {
+chat_modes.register_mode("chat_modes:channel", {
 	help = "Send messages to a specific channel only.",
 
 	can_register = function(playername, params)

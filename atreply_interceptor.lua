@@ -31,7 +31,7 @@ local function needstarget(targetset, target)
 	end
 end
 
-chat_modes.register_interceptor("atreply", function(sender, message, targets)
+chat_modes.register_interceptor("chat_modes:atreply", function(sender, message, targets)
 	if minetest.setting_getbool("chat_modes.no_at_replies") == false then
 		return targets
 	end

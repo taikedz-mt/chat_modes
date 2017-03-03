@@ -10,7 +10,7 @@ if minetest.get_modpath("chat_modes") and chat_modes then
 
 	local examplemode = {}
 
-	chat_modes.register("example", {
+	chat_modes.register_mode("example", {
 		help = "example",
 
 		register = function(playername, params)

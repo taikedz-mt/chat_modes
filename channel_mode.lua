@@ -7,7 +7,7 @@ local playerschannel = {} -- playername --> channel_name
 -- Define a special moderator channel that cannot be joined by regular players
 local moderatorchannel = minetest.setting_get("chat_modes.channels.moderator") or "moderators"
 
-chat_modes.register("channel", {
+chat_modes.register_mode("channel", {
 	help = "Send messages to a specific channel only.",
 
 	can_register = function(playername, params)

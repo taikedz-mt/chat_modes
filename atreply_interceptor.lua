@@ -36,6 +36,10 @@ local function removefrom(players, playername)
 end
 
 chat_modes.register_interceptor("atreply", function(sender, message, targets)
+	if minetest.setting_getbool("chat_modes.no_at_replies") == false then
+		return targets
+	end
+
 	local messageparts = message:split(" ")
 
 	local includes = {"triggerone"}

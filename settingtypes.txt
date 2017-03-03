@@ -9,3 +9,6 @@ chat_modes.maxproximity (Max distance for proximity mode) string 100
 
 # Activation
 chat_modes.active (Activate chat_modes) bool false
+
+# @mentions are on by default
+chat_modes.no_at_replies (Toggle @reply functionality) bool true

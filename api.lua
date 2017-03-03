@@ -1,8 +1,3 @@
--- TODO
--- Implement @-pings
---	- play a sound to target player if @playername is mentioned
---	- if @playername is mentioned, send to that player
-
 
 -- Namespace global variable
 
@@ -12,7 +7,7 @@ chat_modes = {}
 
 minetest.register_privilege("cmodeswitch", "Player can switch their chat mode.")
 
-local debug_on = true
+local debug_on = false
 function chat_modes.dodebug(message, artefact)
 	if not debug_on then return end
 
@@ -33,6 +28,8 @@ dodebug("Loading main variables")
 
 local heuristics = {} -- modestring => mode_definition_table
 
+local interceptors = {} -- name --> function(playername, message, playerlist)
+
 -- Keep track of what mode players are in
 local playermodes = {} -- playername => modestring
 
@@ -51,7 +48,12 @@ local loadmodes = minetest.setting_get("chat_modes.defaults") or "shout,proximit
 dodebug("Exposing API")
 
 function chat_modes.register_mode(modename, mdef)
+	-- TODO sanity check the definition !
 	heuristics[modename] = mdef
+end
+
+function chat_modes.register_interceptor(name, handler)
+	interceptors[name] = handler
 end
 
 -- Send a player chat, unless the player has set themselves ass deaf
@@ -137,7 +139,7 @@ minetest.register_chatcommand("wall", {
 -- Command registration
 dodebug("Define main commands")
 
-minetest.register_chatcommand("assignchatmode", {
+minetest.register_chatcommand("chatmodeset", {
 	privs = {basic_privs = true},
 	params = "<player> <chatmode>",
 	description = "Set a player's chat mode",
@@ -146,8 +148,10 @@ minetest.register_chatcommand("assignchatmode", {
 		local tplayername = table.remove(argsarray, 1)
 
 		if minetest.get_player_by_name(tplayername) then
-			chatmodeswitch(tplayername, argsarray)
 			minetest.chat_send_player(tplayername, playername.." switched your chat: "..table.concat(argsarray, " ") )
+			chatmodeswitch(tplayername, argsarray)
+		else
+			minetest.chat_send_player(playername, "Could not set chat for "..tplayername)
 		end
 	end
 })
@@ -184,7 +188,7 @@ minetest.register_chatcommand("chatmodes", {
 dodebug("Chat interception")
 
 minetest.register_on_chat_message(function(playername, message)
-	message = "<"..playername.."> "..message
+	minetest.log("action", "MODAL CHAT: "..message)
 
 	if not minetest.get_player_privs(playername, {shout = true}) then
 		minetest.chat_send_player(playername, "Chat message send failed. You do not have the 'shout' privilege.")
@@ -203,11 +207,22 @@ minetest.register_on_chat_message(function(playername, message)
 
 	dodebug(playername, {message=message, mode=targetmode, modedef=modedef, sendto = valid_players})
 
+	for handlername,handle in pairs(interceptors) do
+		chat_modes.dodebug("Running interceptor "..handlername)
+		-- Allow interceptors to kill the message
+		local result = handle(playername, message, valid_players)
+		if not result then
+			return true -- marked as handled
+		end
+
+		valid_players = result
+	end
+
 	for _,theplayer in pairs(valid_players) do
 		local theplayername = theplayer:get_player_name()
 		chat_modes.dodebug("trying "..theplayername)
 		if theplayername ~= playername then
-			chat_modes.chatsend(theplayername, message)
+			chat_modes.chatsend(theplayername, "<"..playername.."> "..message)
 		end
 	end
 
@@ -218,7 +233,7 @@ end)
 
 -- ================================
 -- Player management
-dodebug("Manage plauyers joining and leaving")
+dodebug("Manage players joining and leaving")
 
 minetest.register_on_leaveplayer(function(player, timedout)
 	-- Do not discard pref for a timed out player
@@ -250,5 +265,9 @@ if loadmodes then
 else
 	dofile(minetest.get_modpath("chat_modes").."/shout_mode.lua" )
 end
+
+-- Load standard interceptors
+-- Allow direct pinging
+dofile(minetest.get_modpath("chat_modes").."/atreply_interceptor.lua")
 
 dodebug("Loaded chat modes")

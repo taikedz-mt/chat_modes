@@ -1,7 +1,6 @@
 
 local function getnextplayers(messageparts)
 	local includes = {}
-	local i = 1
 
 	-- Consume until found new player names
 	while messageparts[1] and messageparts[1]:sub(1,1) ~= '@' do
@@ -11,8 +10,7 @@ local function getnextplayers(messageparts)
 	-- Get the next set of names
 	while messageparts[1] and messageparts[1]:sub(1,1) == '@' do
 		local token = table.remove(messageparts, 1)
-		includes[i] = token:sub(2, #token)
-		i = i+1
+		includes[#includes+1] = token:sub(2, #token)
 	end
 
 	return {includes=includes, mparts=messageparts}
@@ -43,7 +41,7 @@ chat_modes.register_interceptor("atreply", function(sender, message, targets)
 	local messageparts = message:split(" ")
 
 	local includes = {"triggerone"}
-	local i = 1
+	local private = false
 
 	-- Players mentioned at start of message
 	-- Only send to them
@@ -52,11 +50,11 @@ chat_modes.register_interceptor("atreply", function(sender, message, targets)
 		local dmstring = "DM from "..sender..": "
 
 		local tname = token:sub(2, #token)
-		i = i+1
 		chat_modes.chatsend(tname, dmstring..message)
 		playping(tname)
+		private = true
 	end
-	if i > 1 then
+	if private then
 		chat_modes.dodebug("DECLINE")
 		return false
 	end

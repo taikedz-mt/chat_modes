@@ -4,8 +4,6 @@
 --	- if @playername is mentioned, send to that player
 
 
-
-
 -- Namespace global variable
 
 chat_modes = {}
@@ -14,10 +12,24 @@ chat_modes = {}
 
 minetest.register_privilege("cmodeswitch", "Player can switch their chat mode.")
 
+local debug_on = true
+function chat_modes.dodebug(message, artefact)
+	if not debug_on then return end
+
+	if artefact == nil then
+		artefact = ""
+	else
+		artefact = "Artefact: "..dump(artefact)
+	end
+
+	minetest.debug("[32;1mCHATMODES[0m - "..message .. artefact)
+end
+local dodebug = chat_modes.dodebug
 
 
 -- ================================
 -- Main vairables
+dodebug("Loading main variables")
 
 local heuristics = {} -- modestring => mode_definition_table
 
@@ -30,14 +42,16 @@ local deafplayers = {}
 -- If the user activates chat_modes but does not properly configure it, just activate "shout"
 local defaultmode = minetest.setting_get("chat_modes.mode") or "shout"
 
-
+-- Modes to actually load
+local loadmodes = minetest.setting_get("chat_modes.defaults") or "shout,proximity,channel"
 
 
 -- ================================
 -- Public API
+dodebug("Exposing API")
 
 function chat_modes.register_mode(modename, mdef)
-	chat_modes[modename] = mdef
+	heuristics[modename] = mdef
 end
 
 -- Send a player chat, unless the player has set themselves ass deaf
@@ -53,6 +67,7 @@ end
 
 -- ================================
 -- Chat mode switcher
+dodebug("Define internal switching function")
 
 local function chatmodeswitch(playername, argsarray)
 	local oldmodedef = heuristics[ playermodes[playername] ]
@@ -73,7 +88,7 @@ local function chatmodeswitch(playername, argsarray)
 	-- ====
 
 	if oldmodedef.deregister then
-		oldmodedef.deregsiter(playername)
+		oldmodedef.deregister(playername)
 	end
 
 	playermodes[playername] = newmodename
@@ -90,6 +105,7 @@ end
 
 -- ================================
 -- General chat utilities
+dodebug("Define extra commands")
 
 minetest.register_chatcommand("deaf", {
 	description = "Toggle deaf status. If you are deaf (Deaf mode 'on'), you do not receive any chat messages.",
@@ -119,16 +135,20 @@ minetest.register_chatcommand("wall", {
 
 -- ================================
 -- Command registration
+dodebug("Define main commands")
 
 minetest.register_chatcommand("assignchatmode", {
 	privs = {basic_privs = true},
 	params = "<player> <chatmode>",
 	description = "Set a player's chat mode",
 	func = function(playername, params)
-		local argsarray = argstoarry(arguments)
-		playername = table.remove(argsarray, 1)
+		local argsarray = argstoarry(params)
+		local tplayername = table.remove(argsarray, 1)
 
-		chatmodeswitch(playername, argsarray)
+		if minetest.get_player_by_name(tplayername) then
+			chatmodeswitch(tplayername, argsarray)
+			minetest.chat_send_player(tplayername, playername.." switched your chat: "..table.concat(argsarray, " ") )
+		end
 	end
 })
 
@@ -151,8 +171,9 @@ minetest.register_chatcommand("chatmodes", {
 				helptext = modedef.help
 			end
 
-			minetest.chat_send_player(playername, modename..": "..helptext )
+			minetest.chat_send_player(playername, modename.." : "..helptext )
 		end
+		minetest.chat_send_player(playername, "deaf : stop receiving any chats from players")
 	end,
 })
 
@@ -160,17 +181,34 @@ minetest.register_chatcommand("chatmodes", {
 
 -- ================================
 -- Interception
+dodebug("Chat interception")
 
 minetest.register_on_chat_message(function(playername, message)
+	message = "<"..playername.."> "..message
+
 	if not minetest.get_player_privs(playername, {shout = true}) then
-		return
+		minetest.chat_send_player(playername, "Chat message send failed. You do not have the 'shout' privilege.")
+		return true
 	end
 
-	local modedef = heuristics[ playermodes[playername] ]
-	local valid_players = modedef.getplayers(playername, message)
+	local targetmode = playermodes[playername]
+	local modedef = heuristics[ targetmode ]
+	
+	if not modedef then
+		minetest.chat_send_player(playername, "Unknown chat mode.")
+		return true
+	end
 
-	for _,theplayer in pairs(valid_players.players) do
-		chat_modes.chatsend(theplayer:get_player_name(), message)
+	local valid_players = modedef.getPlayers(playername, message)
+
+	dodebug(playername, {message=message, mode=targetmode, modedef=modedef, sendto = valid_players})
+
+	for _,theplayer in pairs(valid_players) do
+		local theplayername = theplayer:get_player_name()
+		chat_modes.dodebug("trying "..theplayername)
+		if theplayername ~= playername then
+			chat_modes.chatsend(theplayername, message)
+		end
 	end
 
 	return true
@@ -180,6 +218,7 @@ end)
 
 -- ================================
 -- Player management
+dodebug("Manage plauyers joining and leaving")
 
 minetest.register_on_leaveplayer(function(player, timedout)
 	-- Do not discard pref for a timed out player
@@ -199,13 +238,17 @@ end)
 
 -- ================================
 -- Load defaults
+dodebug("Checking for default functions")
 
-local defaultmodes = minetest.setting_get("chat_modes.defaults") or defaultmode
-if defaultmodes then
-	for _,modename in pairs(defaultmodes:split(",")) do
+if loadmodes then
+	dodebug("Default modes found:",loadmodes:split(","))
+
+	for _,modename in pairs(loadmodes:split(",")) do
+		dodebug("Loading ",modename)
 		dofile(minetest.get_modpath("chat_modes").."/"..modename.."_mode.lua" )
 	end
 else
 	dofile(minetest.get_modpath("chat_modes").."/shout_mode.lua" )
 end
 
+dodebug("Loaded chat modes")

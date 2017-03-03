@@ -41,7 +41,7 @@ The following (fairly pointless) module will send a mesasge to some players, dep
 
 	local probplayers = {}
 
-	chat_modes.register("maybesay", {
+	chat_modes.register_mode("maybesay", {
 		help = "<prob> -- send a message to all, with a probability <prob> of sending the message at all.",
 
 		register = function(playername, params)

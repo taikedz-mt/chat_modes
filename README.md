@@ -1,7 +1,5 @@
 # Minetest : Chat Modes (`chat_modes`)
 
-***----- incomplete -----***
-
 A Minetest mod to enable multiple chat modes.
 
 By default, `chat_modes` is not active. Set `chat_modes.active = true` to activate it. This allows Chat Modes to be incuded in a subgame and not affect singleplayer mode, or be obtrusive to servers that do not want to include its functionality by default.
@@ -14,8 +12,9 @@ Players with `shout`, but without `cmodeswitch`, will only be able to use the de
 
 ## Default Modules
 
-A few modules are provided by default, annd active by default if `chat_modes.active` is set to true:
+A few modules are provided by default, and active by default if `chat_modes.active` is set to true:
 
+* `deaf` -- the deaf-mode toggle allows players to ignore player chats, without turning off feedback from other mods.
 * `shout` -- this allows the player to broadacast a message to all connected players, just like in normal chat.
 * `proximity` -- this module sends a message to players within the proximity of the sending player
 * `channel` -- this module sends messages only to players who are in the shout channel. A player can only be in one channel at a time.
@@ -28,6 +27,20 @@ By default, this is set to
 	chat_modes.available = shout,proximity,channel
 
 By setting `chat_modes.available = ` (that is, a blank string) the default modules are turned off. Only mods that register any extra modes will be active.
+
+### `@reply` messages
+
+Targeted messaging tool that allows mentioning player names to send messages directly, with multiple names in the messge.
+
+* If there is a list of @players at the start of a chat message, the message will ONLY be sent to them
+* If the list is not at the beginning, then the message will be sent to all who would be affected by the active mode, as well as the players in the @mentions
+
+
+Example: `@admin @moderator I want to report @cheater and @griefer` will only be sent to "@admin" and "@moderator"
+
+Example: `Hey guys can @friend @niceguy and @ally join our channel?` will send to all players who would normally receive the message in the player's mode, as well as to @friend, @niceguy and @ally
+
+Messages will not be delivered to players with deaf-mode activated.
 
 ## Usage
 

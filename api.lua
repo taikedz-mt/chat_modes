@@ -188,12 +188,12 @@ minetest.register_chatcommand("chatmodes", {
 dodebug("Chat interception")
 
 minetest.register_on_chat_message(function(playername, message)
-	minetest.log("action", "MODAL CHAT: "..message)
-
 	if not minetest.get_player_privs(playername, {shout = true}) then
 		minetest.chat_send_player(playername, "Chat message send failed. You do not have the 'shout' privilege.")
 		return true
 	end
+
+	minetest.log("action", "MODAL CHAT: "..message)
 
 	local targetmode = playermodes[playername]
 	local modedef = heuristics[ targetmode ]

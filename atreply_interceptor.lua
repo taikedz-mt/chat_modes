@@ -21,16 +21,14 @@ local function playping(playername)
 	return
 end
 
-local function removefrom(players, playername)
-	local i = 1
-	while players[i] do
-		if players[i]:get_player_name() == playername then
-			table.remove(players, i)
-			break
+-- Returns the target if it does not exist in the set
+-- else returns nil
+local function needstarget(targetset, target)
+	for _,testtarget in pairs(targetset) do
+		if testtarget == target then
+			return target
 		end
 	end
-
-	return players
 end
 
 chat_modes.register_interceptor("atreply", function(sender, message, targets)
@@ -42,21 +40,23 @@ chat_modes.register_interceptor("atreply", function(sender, message, targets)
 
 	local includes = {"triggerone"}
 	local private = false
+	local newtargets = {}
 
 	-- Players mentioned at start of message
 	-- Only send to them
 	while messageparts[1] and messageparts[1]:sub(1,1) == '@' do
 		local token = table.remove(messageparts, 1)
-		local dmstring = "DM from "..sender..": "
-
 		local tname = token:sub(2, #token)
-		chat_modes.chatsend(tname, dmstring..message)
-		playping(tname)
+
+		local targetplayer = needstarget(targets, minetest.get_player_by_name(tname) )
+		if targetplayer then
+			newtargets[#newtargets+1] = targetplayer
+			playping(tname)
+		end
 		private = true
 	end
 	if private then
-		chat_modes.dodebug("DECLINE")
-		return false
+		return newtargets
 	end
 
 	while includes[1] do -- hence "triggerone" to do it at least once
@@ -64,16 +64,22 @@ chat_modes.register_interceptor("atreply", function(sender, message, targets)
 		includes = nextin.includes
 		messageparts = nextin.mparts
 
-		local dmstring = "DM from "..sender..": "
-
 		for _,pname in pairs(includes) do
-			chat_modes.chatsend(pname, dmstring..message)
-			playping(pname)
-			targets = removefrom(table.copy(targets), playername)
+			local targetplayer = needstarget(targets, minetest.get_player_by_name(tname) )
+			if targetplayer then
+				newtargets[#newtargets+1] = targetplayer
+				playping(tname)
+			end
 		end
 	end
 
-	chat_modes.dodebug("ALLOW")
-	return targets -- Allow processing the rest
+	for _,residualplayer in pairs(targets) do
+		local targetplayer = needstarget(newtargets, residualplayer )
+		if targetplayer then
+			newtargets[#newtargets+1] = targetplayer
+		end
+	end
+
+	return newtargets
 end)
 

@@ -7,6 +7,8 @@ chat_modes = {}
 
 minetest.register_privilege("cmodeswitch", "Player can switch their chat mode.")
 
+-- ========================================================
+-- Don't litter
 local debug_on = false
 function chat_modes.dodebug(message, artefact)
 	if not debug_on then return end
@@ -54,6 +56,7 @@ function chat_modes.register_interceptor(name, handler)
 end
 
 -- Send a player chat
+-- Residual function, should be removed
 function chat_modes.chatsend(player, message)
 	if type(player) ~= "string" then
 		player = player:get_player_name()
@@ -233,7 +236,7 @@ end)
 
 -- ================================
 -- Load defaults
-dodebug("Checking for default functions")
+dodebug("Loading default modes")
 
 if loadmodes then
 	dodebug("Default modes found:",loadmodes:split(","))
@@ -246,8 +249,18 @@ else
 	dofile(minetest.get_modpath("chat_modes").."/shout_mode.lua" )
 end
 
+-- ================================
 -- Load standard interceptors
+
+dodebug("Loading default interceptors")
+
 -- Allow direct pinging
 dofile(minetest.get_modpath("chat_modes").."/atreply_interceptor.lua")
+
+-- Deafness
+-- Deaf filter is processed after any other interceptors may have
+--  modified the target list
+-- FIXME if other interceptors discard the original list, this effect is nulled....
+dofile(minetest.get_modpath("chat_modes").."/deaf_interceptor.lua")
 
 dodebug("Loaded chat modes")

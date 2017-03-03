@@ -103,3 +103,13 @@ For example, this (pointless) interceptor can decline to send messages from play
 
 		return newtargets
 	end)
+
+### Deaf Interceptor
+
+A special interceptor exists for player deafness.
+
+If you discard the old target list entirely to build a new target list from scratch, it is recommended to respect player deafness.
+
+You can check for deafness by using
+
+	chat_modes.isdeaf(playername)

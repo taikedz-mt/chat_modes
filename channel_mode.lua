@@ -13,7 +13,7 @@ local function channelcheck(playername, params)
 		return false
 	end
 	if params[1] == moderatorchannel then
-		return minetest.get_player_privs(playername, {basic_privs=true})
+		return minetest.check_player_privs(playername, {basic_privs=true})
 	else
 		return true
 	end
@@ -23,11 +23,7 @@ chat_modes.register_mode("channel", {
 	help = "Send messages to a specific channel only.",
 
 	can_register = function(playername, params)
-		if not channelcheck(playername, params) then
-			return false
-		end
-
-		return true
+		return channelcheck(playername, params)
 	end,
 
 	register = function(playername, params)

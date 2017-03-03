@@ -36,7 +36,15 @@ chat_modes.register_mode("channel", {
 		end
 
 		local channelname = params[1]
-		local channelplayers = allchannels[ channelname ] or {}
+		playerschannel[playername] = channelname
+
+		if not allchannels[channelname] then
+			allchannels[channelname] = {}
+		end
+
+		local channelplayers = allchannels[ channelname ]
+
+
 
 		channelplayers[playername] = minetest.get_player_by_name(playername)
 		playerschannel[playername] = channelname
@@ -45,7 +53,8 @@ chat_modes.register_mode("channel", {
 	end,
 
 	deregister = function(playername)
-		local channelplayers = allchannels[playername]
+		local channelname = playerschannel[playername]
+		local channelplayers = allchannels[channelname]
 
 		channelplayers[playername] = nil
 		playerschannel[playername] = nil
@@ -53,10 +62,19 @@ chat_modes.register_mode("channel", {
 
 	getPlayers = function(playername, message)
 		local targetplayers = {}
-		
-		for _,player in pairs(allchannels[ playerschannel[playername] ]) do
-			targetplayers[#targetplayers] = player
+		local channelname = playerschannel[playername]
+		local channelplayers = allchannels[channelname]
+
+		chat_modes.dodebug("Got channel for "..playername..": ", {channel=channelname, channelplayers=allchannels[channelname] })
+
+		-- Use an explicit counter because #targetplayers is always 0
+		local i = 1
+		for playername,player in pairs(channelplayers) do
+			targetplayers[i] = player
+			i = i+1
 		end
+
+		chat_modes.dodebug("Valid players are ", targetplayers)
 
 		return targetplayers
 	end

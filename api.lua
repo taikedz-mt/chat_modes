@@ -33,9 +33,6 @@ local interceptors = {} -- name --> function(playername, message, playerlist)
 -- Keep track of what mode players are in
 local playermodes = {} -- playername => modestring
 
--- Keep track of players who have deafened themselves
-local deafplayers = {}
-
 -- If the user activates chat_modes but does not properly configure it, just activate "shout"
 local defaultmode = minetest.setting_get("chat_modes.mode") or "shout"
 
@@ -56,15 +53,13 @@ function chat_modes.register_interceptor(name, handler)
 	interceptors[name] = handler
 end
 
--- Send a player chat, unless the player has set themselves ass deaf
+-- Send a player chat
 function chat_modes.chatsend(player, message)
 	if type(player) ~= "string" then
 		player = player:get_player_name()
 	end
 
-	if not deafplayers[player] then
-		minetest.chat_send_player(player, message)
-	end
+	minetest.chat_send_player(player, message)
 end
 
 -- ================================
@@ -109,24 +104,10 @@ end
 -- General chat utilities
 dodebug("Define extra commands")
 
-minetest.register_chatcommand("deaf", {
-	description = "Toggle deaf status. If you are deaf (Deaf mode 'on'), you do not receive any chat messages.",
-	privs = {shout = true},
-	func = function(playername, args)
-		if deafplayers[playername] then
-			deafplayers[playername] = nil
-			minetest.chat_send_player(playername, "Deaf mode OFF")
-		else
-			deafplayers[playername] = true
-			minetest.chat_send_player(playername, "Deaf mode ON")
-		end
-	end,
-})
-
 -- Send message to all, named after the UNIX command of the same name
 minetest.register_chatcommand("wall", {
 	params = "<compulsory message>",
-	description = "Send a message to all players, regardless of chat mode or deaf status - for moderators.",
+	description = "Send a message to all players, regardless of chat mode or interceptors - for moderators.",
 	privs = {shout = true, basic_privs = true},
 	func = function(playername, message)
 		minetest.chat_send_all("MODERATOR "..playername..": "..message)
@@ -177,7 +158,6 @@ minetest.register_chatcommand("chatmodes", {
 
 			minetest.chat_send_player(playername, modename.." : "..helptext )
 		end
-		minetest.chat_send_player(playername, "deaf : stop receiving any chats from players")
 	end,
 })
 

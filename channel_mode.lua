@@ -64,10 +64,8 @@ chat_modes.register_mode("channel", {
 		chat_modes.dodebug("Got channel for "..playername..": ", {channel=channelname, channelplayers=allchannels[channelname] })
 
 		-- Use an explicit counter because #targetplayers is always 0
-		local i = 1
 		for playername,player in pairs(channelplayers) do
-			targetplayers[i] = player
-			i = i+1
+			targetplayers[#targetplayers+1] = player
 		end
 
 		chat_modes.dodebug("Valid players are ", targetplayers)
